@@ -1,31 +1,38 @@
 /**
  * Description: Reduces DP on intervals with a monotonic cost of splitting array function from O(n^3) to O(n^2).
- * Source: https://apps.topcoder.com/forums/?module=Thread&threadID=697369&start=0&mc=22#1327577
+ * Condition: 
+    - dp[i][j] = C[i][j] + min{i < k < j}(dp[i][k] + dp[k][j])
+    - quadrangle inequality: C[a][c] + C[b][d] <= C[a][d] + C[b][c], a <= b <= c <= d
+    - monotonicity: C[b][c] <= C[a][d], a <= b <= c <= d
+ * Source: https://jeffreyxiao.me/blog/knuths-optimization
  * Verification: https://www.spoj.com/problems/BRKSTRNG/
  * Time: O(n^2)
  */
 
-#define MAXN 1000
+using ll = long long;
 
-int n, dp[MAXN][MAXN], opt[MAXN][MAXN];
+const int MAX_N = 5e3 + 5;
 
-int cost(int l, int r);
+int n, opt[MAX_N][MAX_N];
+ll dp[MAX_N][MAX_N];
 
-void knuth() {
-    for (int len=0; len<n; len++)
-        for (int i=0; i+len<n; i++) {
-            int j = i + len;
-            if (len < 2) {
-                dp[i][j] = 0;
-                opt[i][j] = i;
-                continue;
+ll cost(int l, int r);
+
+void knuth() { 
+    memset(dp, 0x3f, sizeof dp);
+    for (int i = 1; i <= n; i++) {
+        dp[i][i] = 0;
+        opt[i][i] = i;
+    }
+    for (int i = n; i >= 1; i--) {
+        for (int j = i + 1; j <= n; j++) {
+            for (int k = opt[i][j - 1]; k <= opt[i + 1][j]; k++) {
+                if (dp[i][j] > dp[i][k] + dp[k + 1][j]) {
+                    dp[i][j] = dp[i][k] + dp[k + 1][j];
+                    opt[i][j] = k;
+                }
             }
-
-            pair<int, int> best(INT_MAX, -1);
-            for (int k=opt[i][j-1]; k<=opt[i+1][j]; k++)
-                best = min(best, {dp[i][k] + dp[k][j] + cost(i, j), k});
-
-            dp[i][j] = best.first;
-            opt[i][j] = best.second;
+            dp[i][j] += cost(i, j);
         }
+    }
 }

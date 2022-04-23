@@ -5,24 +5,21 @@
  * Time: O(n)
  */
 
-template<typename T>
-struct MinDeque {
+template<typename T> struct MinDeque {
     int l = 0, r = 0;
-    deque<pair<T, int>> dq;
-
+    deque<pair<T,int>> dq;
+    
     void push(T x) {
-        while (!dq.empty() && x <= dq.back().first)
-            dq.pop_back();
+        while (!dq.empty() && x <= dq.back().first) dq.pop_back();
         dq.emplace_back(x, r++);
     }
 
     void pop() {
         assert(l < r);
-        if (dq.front().second == l++)
-            dq.pop_front();
+        if (dq.front().second == l++) dq.pop_front();
     }
 
-    T min() {
+    T getMin() {
         assert(!dq.empty());
         return dq.front().first;
     }

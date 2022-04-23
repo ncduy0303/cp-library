@@ -5,36 +5,35 @@
  * Time: O(n) build, O(log n) query and update
  */
 
-template<typename T>
+struct Node {
+    int mn;
+    Node(): mn(INT_MAX) {}
+    Node(int x): mn(x) {}
+    Node(const Node &l, const Node &r) {
+        mn = min(l.mn, r.mn);
+    }
+};
+
 struct SegmentTree {
-    int n;
-    const T id;
-    vector<T> st;
-
-    T merge(const T &a, const T &b) {
-        return a + b;
+    int n; vector<Node> st;
+    
+    void init(int _n) { n = _n; st.resize(2 * _n); }
+    void init(const vector<int> &a) {
+        init(sz(a));
+        for (int i = 0; i < n; i++) st[i + n] = Node(a[i]);
+        for (int i = n - 1; i > 0; i--) st[i] = Node(st[i << 1], st[i << 1 | 1]);
     }
 
-    SegmentTree(int _n) : n(_n), st(2 * n, id) {}
-
-    SegmentTree(const vector<T> &a) : n((int) a.size()), st(2 * n) {
-        for (int i=0; i<n; i++)
-            st[i+n] = a[i];
-        for (int i=n-1; i>0; i--)
-            st[i] = merge(st[i<<1], st[i<<1|1]);
-    }
-
-    T query(int l, int r) {
-        T ls = id, rs = id;
-        for (l+=n, r+=n+1; l<r; l>>=1, r>>=1) {
-            if (l&1) ls = merge(ls, st[l++]);
-            if (r&1) rs = merge(st[--r], rs);
+    Node query(int l, int r) {
+        Node resl, resr;
+        for (l += n, r += n + 1; l < r; l >>= 1, r >>= 1) {
+            if (l & 1) resl = Node(resl, st[l++]);
+            if (r & 1) resr = Node(st[--r], resr);
         }
-        return merge(ls, rs);
+        return Node(resl, resr);
     }
 
-    void update(int p, T val) {
-        for (st[p+=n]=val, p>>=1; p>0; p>>=1)
-            st[p] = merge(st[p<<1], st[p<<1|1]);
+    void update(int i, int x) {
+        for (st[i += n] = Node(x); i >>= 1; ) st[i] = Node(st[i << 1], st[i << 1 | 1]);
     }
 };

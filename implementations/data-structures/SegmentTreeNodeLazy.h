@@ -5,103 +5,71 @@
  * Time: O(n) build, O(log n) query and update
  */
 
-struct SegmentTree {
-    struct Node {
-        int ans = 0, lazy = 0, l, r;
+struct Node {
+    ll sum, lzSet;
+    Node(): sum(0), lzSet(LLONG_MAX) {}
+    Node(ll x): sum(x), lzSet(LLONG_MAX) {}
+    Node(const Node &l, const Node &r) {
+        sum = l.sum + r.sum;
+        lzSet = LLONG_MAX;
+    }
+};
 
-        void leaf(int val) {
-            ans += val;
-        }
+struct SegmentTree { 
+    int ln(int node) { return 2 * node; }
+    int rn(int node) { return 2 * node + 1; }
 
-        void pull(const Node &a, const Node &b) {
-            ans = a.ans + b.ans;
-        }
+    int n; vector<Node> st;
 
-        void push(int val) {
-            lazy += val;
-        }
+    void init(int _n) { n = _n; st.resize(4 * _n); }
+    void init(const vector<int> &a) { init(sz(a)); build(a, 1, 0, n - 1); }
 
-        void apply() {
-            ans += (r - l + 1) * lazy;
-            lazy = 0;
-        }
-    };
-
-    int n;
-    vector<int> a;
-    vector<Node> st;
-
-    SegmentTree(int _n) : n(_n), a(n), st(4*n) {
-        build(1, 0, n-1);
+    void apply(int node, int start, int end, ll x) {
+        if (x == LLONG_MAX) return;
+        st[node].sum = x * (end - start + 1);
+        st[node].lzSet = x;
     }
 
-    SegmentTree(const vector<int> &_a) : n((int) _a.size()), a(_a), st(4*n) {
-        build(1, 0, n-1);
+    void push(int node, int start, int end) {
+        if (start == end) return;
+        int mid = (start + end) / 2;
+        apply(ln(node), start, mid, st[node].lzSet);
+        apply(rn(node), mid + 1, end, st[node].lzSet);
+        st[node].lzSet = LLONG_MAX;
     }
 
-    void build(int p, int l, int r) {
-        st[p].l = l;
-        st[p].r = r;
-        if (l == r) {
-            st[p].leaf(a[l]);
+    void build(const vector<int> &a, int node, int start, int end) {
+        if (start == end) {
+            st[node] = Node(a[start]);
             return;
         }
-        int m = (l + r) / 2;
-        build(2*p, l, m);
-        build(2*p+1, m+1, r);
-        st[p].pull(st[2*p], st[2*p+1]);
+        int mid = (start + end) / 2;
+        build(a, ln(node), start, mid);
+        build(a, rn(node), mid + 1, end);
+        st[node] = Node(st[ln(node)], st[rn(node)]);
     }
 
-    void push(int p) {
-        if (st[p].lazy) {
-            if (st[p].l != st[p].r) {
-                st[2*p].push(st[p].lazy);
-                st[2*p+1].push(st[p].lazy);
-            }
-            st[p].apply();
-        }
-    }
-
-    Node query(int p, int i, int j) {
-        push(p);
-        if (st[p].l == i && st[p].r == j)
-            return st[p];
-        int m = (st[p].l + st[p].r) / 2;
-        if (j <= m)
-            return query(2*p, i, j);
-        else if (i > m)
-            return query(2*p+1, i, j);
-        Node ret, ls = query(2*p, i, m), rs = query(2*p+1, m+1, j);
-        ret.pull(ls, rs);
-        return ret;
-    }
-
-    int query(int i, int j) {
-        return query(1, i, j).ans;
-    }
-
-    void update(int p, int i, int j, int val) {
-        if (st[p].l == i && st[p].r == j) {
-            st[p].push(val);
-            push(p);
+    void update(int node, int start, int end, int l, int r, ll x) {
+        push(node, start, end);
+        if (r < start || end < l) return;
+        if (l <= start && end <= r) {
+            apply(node, start, end, x);
             return;
         }
-        push(p);
-        int m = (st[p].l + st[p].r) / 2;
-        if (j <= m) {
-            update(2*p, i, j, val);
-            push(2*p+1);
-        } else if (i > m) {
-            push(2*p);
-            update(2*p+1, i, j, val);
-        } else {
-            update(2*p, i, m, val);
-            update(2*p+1, m+1, j, val);
-        }
-        st[p].pull(st[2*p], st[2*p+1]);
+        int mid = (start + end) / 2;
+        update(ln(node), start, mid, l, r, x);
+        update(rn(node), mid + 1, end, l, r, x);
+        st[node] = Node(st[ln(node)], st[rn(node)]);
     }
 
-    void update(int i, int j, int val) {
-        update(1, i, j, val);
+    Node query(int node, int start, int end, int l, int r) {
+        push(node, start, end);
+        if (r < start || end < l) return Node();
+        if (l <= start && end <= r) return st[node];
+        int mid = (start + end) / 2;
+        return Node(query(ln(node), start, mid, l, r), query(rn(node), mid + 1, end, l, r));
     }
+    
+    void update(int l, int r, ll x) { update(1, 0, n - 1, l, r, x); }
+    Node query(int l, int r) { return query(1, 0, n - 1, l, r); }
 };

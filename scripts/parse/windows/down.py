@@ -28,7 +28,7 @@ import re
 import os
 from shutil import rmtree
 
-TEMPLATE_DIR = 'C:/Users/Max/cp-library/implementations/temp.cpp'
+TEMPLATE_DIR = 'C:/Users/maxzh/cp-library/implementations/temp.cpp'
 
 # Returns unmarshalled or None
 def listen_once(*, timeout=None):
@@ -82,6 +82,9 @@ def get_prob_name(data, single):
 
     if 'UVa' in data['group']:
         return data['name'].split()[0].zfill(5)
+
+    if 'LibreOJ' in data['group']:
+        return 'loj' + [i for i in data['url'].split('/') if i][-1]
 
     patternMatch = NAME_PATTERN.search(data['name'])
     if patternMatch is not None:

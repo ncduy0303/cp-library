@@ -5,22 +5,23 @@
  * Time: O(m log n)
  */
 
-const int MAXN = 100005;
+const int MAX_N = 100005;
 
-int dist[MAXN];
-vector<pair<int, int>> adj[MAXN];
+vector<ar<int,2>> adj[MAX_N];
+ll dist[MAX_N];
 
 void dijkstra(int s) {
-    memset(dist, 127, sizeof(dist));
-    priority_queue<pair<int, int>, vector<pair<int, int>>, greater<pair<int, int>>> pq;
-    pq.emplace(dist[s] = 0, s);
+    memset(dist, 0x3f, sizeof dist);
+    priority_queue<ar<ll,2>,vector<ar<ll,2>>,greater<ar<ll,2>>> pq;
+    pq.push({dist[s] = 0, s});
     while (!pq.empty()) {
-        auto [d, u] = pq.top();
-        pq.pop();
-        if (d > dist[u])
-            continue;
-        for (auto [v, w] : adj[u])
-            if (dist[u] + w < dist[v])
-                pq.emplace(dist[v] = dist[u] + w, v);
-    }
+        auto [d, u] = pq.top(); pq.pop();
+        if (d > dist[u]) continue;
+        for (auto [v, w] : adj[u]) {
+            if (dist[v] > dist[u] + w) {
+                dist[v] = dist[u] + w;
+                pq.push({dist[v], v});
+            }
+        }
+    } 
 }

@@ -7,65 +7,60 @@
 
 struct BinaryLift {
     int n, lg;
-    vector<int> depth;
-    vector<vector<int>> adj, up;
-
-    BinaryLift(int _n) : n(_n), lg(__lg(n - 1) + 1), depth(n), adj(n), up(lg, vector<int>(n, -1)) {}
-
+    vector<int> dep;
+    vector<vector<int>> adj, par;
+    
+    BinaryLift(int _n) : n(_n), lg(__lg(n - 1) + 1), dep(n), adj(n), par(n, vector<int>(lg, -1)) {}
+    
     void addEdge(int u, int v) {
         adj[u].push_back(v);
         adj[v].push_back(u);
     }
 
-    void init(int r = -1) {
-        if (r == -1) {
-            for (int u=0; u<n; u++)
-                if (up[0][u] == -1)
-                    dfs(u);
-        } else {
-            dfs(r);
+    void init(int s = 0) {
+        dfs(s);
+        for (int j = 1; j < lg; j++) {
+            for (int i = 0; i < n; i++) {
+                if (par[i][j - 1] != -1) {
+                    par[i][j] = par[par[i][j - 1]][j - 1];
+                }
+            }
         }
-        for (int i=1; i<lg; i++)
-            for (int j=0; j<n; j++)
-                if (up[i-1][j] != -1)
-                    up[i][j] = up[i-1][up[i-1][j]];
     }
 
     void dfs(int u) {
-        for (int v : adj[u])
-            if (v != up[0][u]) {
-                depth[v] = depth[u] + 1;
-                up[0][v] = u;
-                dfs(v);
-            }
-    }
-
-    int lca(int u, int v) {
-        if (depth[u] < depth[v])
-            swap(u, v);
-        for (int i=lg-1; i>=0; i--)
-            if (depth[u] - (1 << i) >= depth[v])
-                u = up[i][u];
-        if (u == v)
-            return u;
-        for (int i=lg-1; i>=0; i--)
-            if (up[i][u] != up[i][v]) {
-                u = up[i][u];
-                v = up[i][v];
-            }
-        return up[0][u];
-    }
-
-    int dist(int u, int v) {
-        return depth[u] + depth[v] - 2 * depth[lca(u, v)];
+        for (int v : adj[u]) {
+            if (v == par[u][0]) continue;
+            dep[v] = dep[u] + 1;
+            par[v][0] = u;
+            dfs(v);
+        }
     }
 
     int kthAnc(int u, int k) {
-        if (k > depth[u])
-            return -1;
-        for (int i=0; i<lg; i++)
-            if (k >> i & 1)
-                u = up[i][u];
+        if (k > dep[u]) return -1;
+        for (int j = 0; j < lg; j++) {
+            if (k & (1 << j)) {
+                u = par[u][j];
+            }
+        }
         return u;
+    }
+
+    int lca(int u, int v) {
+        if (dep[u] < dep[v]) swap(u, v);
+        u = kthAnc(u, dep[u] - dep[v]);
+        if (u == v) return u;
+        for (int j = lg - 1; j >= 0; j--) {
+            if (par[u][j] != par[v][j]) {
+                u = par[u][j];
+                v = par[v][j];
+            }
+        }
+        return par[u][0];
+    }
+
+    int dist(int u, int v) { 
+        return dep[u] + dep[v] - 2 * dep[lca(u, v)];
     }
 };

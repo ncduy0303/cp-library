@@ -5,35 +5,27 @@
  * Time: O(n * maxW + m)
  */
 
-#define MAXN 100000
-
-const int maxW;
-int n, dist[MAXN];
-list<int>::iterator pos[MAXN];
-vector<pair<int, int>> adj[MAXN];
+int n, dist[MAX_N];
+list<int>::iterator pos[MAX_N];
+vector<ar<int,2>> adj[MAX_N];
 
 void dijkstra(int s) {
-    memset(dist, 127, sizeof(dist));
-    const int INF = dist[0];
-
+    memset(dist, 0x3f, sizeof dist);
+    const int inf = dist[0];
     int i = 0;
     vector<list<int>> b(n * maxW + 1);
     dist[s] = 0;
     b[0].push_back(s);
     while (i < n * maxW) {
-        int u = b[i].front();
-        b[i].pop_front();
-
-        for (auto e : adj[u])
-            if (dist[u] + e.second < dist[e.first]) {
-                if (dist[e.first] != INF)
-                    b[dist[e.first]].erase(pos[e.first]);
-                dist[e.first] = dist[u] + e.second;
-                b[dist[e.first]].push_front(e.first);
-                pos[e.first] = b[dist[e.first]].begin();
+        int u = b[i].front(); b[i].pop_front();
+        for (auto [v, w] : adj[u]) {
+            if (dist[v] > dist[u] + w) {
+                if (dist[v] != inf) b[dist[v]].erase(pos[v]);
+                dist[v] = dist[u] + w;
+                b[dist[v]].push_front(v);
+                pos[v] = b[dist[v]].begin();
             }
-
-        while (i < n * maxW && b[i].empty())
-            i++;
+        }
+        while (i < n * maxW && b[i].empty()) i++;
     }
 }

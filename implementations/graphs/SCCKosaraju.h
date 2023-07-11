@@ -5,19 +5,19 @@
  * Time: O(n + m)
  */
 
-#define MAXN 100000
+#define MAX_N 100000
 
 int n, sccCount;
-bool visited[MAXN];
-vector<int> adj[MAXN], adjr[MAXN];
-stack<int> st;
+bool visited[MAX_N];
+vector<int> adj[MAX_N], adjr[MAX_N];
+stack<int> stk;
 
 void dfs1(int u) {
     visited[u] = true;
     for (int v : adj[u])
         if (!visited[v])
             dfs1(v);
-    st.push(u);
+    stk.push(u);
 }
 
 void dfs2(int u) {
@@ -36,9 +36,9 @@ void scc() {
             dfs1(i);
 
     memset(visited, false, sizeof(visited));
-    while (!st.empty()) {
-        int u = st.top();
-        st.pop();
+    while (!stk.empty()) {
+        int u = stk.top();
+        stk.pop();
         if (!visited[u]) {
             dfs2(u);
             sccCount++;

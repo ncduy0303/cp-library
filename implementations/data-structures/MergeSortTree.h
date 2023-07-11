@@ -5,10 +5,10 @@
  * Time: O(n log n) build, O(log^2 n) query
  */
 
-#define MAXN 100000
+#define MAX_N 100000
 
-int a[MAXN];
-vector<int> st[4*MAXN];
+int a[MAX_N];
+vector<int> st[4 * MAX_N];
 
 void build(int p, int l, int r) {
     if (l == r) {
@@ -22,6 +22,7 @@ void build(int p, int l, int r) {
     merge(st[2*p].begin(), st[2*p].end(), st[2*p+1].begin(), st[2*p+1].end(), back_inserter(st[p]));
 }
 
+// number of elements greater than a specified number
 int query(int p, int l, int r, int i, int j, int k) {
     if (i > r || j < l)
         return 0;
@@ -30,4 +31,19 @@ int query(int p, int l, int r, int i, int j, int k) {
 
     int m = (l + r) / 2;
     return query(2*p, l, m, i, j, k) + query(2*p+1, m+1, r, i, j, k);
+}
+
+// smallest number greater or equal to a specified number
+int query(int v, int tl, int tr, int l, int r, int x) {
+    if (l > r)
+        return INF;
+    if (l == tl && r == tr) {
+        vector<int>::iterator pos = lower_bound(t[v].begin(), t[v].end(), x);
+        if (pos != t[v].end())
+            return *pos;
+        return INF;
+    }
+    int tm = (tl + tr) / 2;
+    return min(query(v*2, tl, tm, l, min(r, tm), x), 
+               query(v*2+1, tm+1, tr, max(l, tm+1), r, x));
 }

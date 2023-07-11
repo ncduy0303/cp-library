@@ -5,23 +5,49 @@
  * Time: O(n * m)
  */
 
-#define MAXN 100
+#define MAX_N 100
+#define ar array
 
-int n, dist[MAXN];
-vector<pair<int, int>> adj[MAXN];
+int n, m, pre[MAX_N];
+vector<ar<int,2>> adj[MAX_N];
+ll dist[MAX_N];
 
 bool bellmanFord(int s) {
-    memset(dist, 127, sizeof(dist));
-    dist[s] = 0;
-    bool cycle;
-    for (int i=0; i<n; i++) {
-        cycle = false;
-        for (int u=0; u<n; u++)
-            for (auto e : adj[u])
-                if (dist[u] + e.second < dist[e.first]) {
-                    dist[e.first] = dist[u] + e.second;
-                    cycle = true;
+    memset(dist, 0x3f, sizeof dist);
+    dist[s] = 0; pre[s] = -1;
+    for (int i = 0; i < n - 1; i++) {
+        for (int u = 0; u < n; u++) {
+            for (auto [v, w] : adj[u]) {
+                if (dist[v] > dist[u] + w) {
+                    dist[v] = dist[u] + w;
+                    pre[v] = u;
                 }
+            }
+        }
     }
+    for (int u = 0; u < n; u++) {
+        for (auto [v, w] : adj[u]) {
+            if (dist[v] > dist[u] + w) {
+                return true;
+            }
+        }
+    }
+    return false;
+}
+ 
+vector<int> getCycle() {
+    int node = -1;
+    for (int u = 0; u < n; u++) {
+        for (auto [v, w] : adj[u]) { 
+            if (dist[v] > dist[u] + w) { 
+                node = v;
+            }
+        }
+    }
+    for (int i = 0; i < n; i++) node = pre[node];
+    vector<int> cycle; cycle.push_back(node);
+    for (int i = pre[node]; i != node; i = pre[i]) cycle.push_back(i); 
+    cycle.push_back(node);
+    reverse(cycle.begin(), cycle.end());
     return cycle;
 }

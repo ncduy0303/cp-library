@@ -18,37 +18,40 @@ struct Matching {
     }
 
     bool bfs() {
-        queue<int> q;
-        for (int u=1; u<=n; u++) {
+        queue<int> que;
+        for (int u = 1; u <= n; u++) {
             if (!matchL[u]) {
                 dist[u] = 0;
-                q.push(u);
+                que.push(u);
             } else {
                 dist[u] = INT_MAX;
             }
         }
         dist[0] = INT_MAX;
-        while (!q.empty()) {
-            int u = q.front();
-            q.pop();
-            if (dist[u] < dist[0])
-                for (int v : adj[u])
+        while (!que.empty()) {
+            int u = que.front();
+            que.pop();
+            if (dist[u] < dist[0]) {
+                for (int v : adj[u]) {
                     if (dist[matchR[v]] == INT_MAX) {
                         dist[matchR[v]] = dist[u] + 1;
-                        q.push(matchR[v]);
+                        que.push(matchR[v]);
                     }
+                }
+            }
         }
         return dist[0] != INT_MAX;
     }
 
     bool dfs(int u) {
         if (u != 0) {
-            for (int v : adj[u])
+            for (int v : adj[u]) {
                 if (dist[matchR[v]] == dist[u] + 1 && dfs(matchR[v])) {
                     matchL[u] = v;
                     matchR[v] = u;
                     return true;
                 }
+            }
             dist[u] = INT_MAX;
             return false;
         }
@@ -58,7 +61,7 @@ struct Matching {
     int solve() {
         int ret = 0;
         while (bfs())
-            for (int u=1; u<=n; u++)
+            for (int u = 1; u <= n; u++)
                 if (!matchL[u] && dfs(u))
                     ret++;
         return ret;

@@ -5,28 +5,29 @@
  * Time: O(n * m)
  */
 
-#define MAXN 100
+#define MAX_N 100
 
-int n, match[MAXN];
-bool visited[MAXN];
-vector<int> adj[MAXN];
+int n, match[MAX_N];
+bool visited[MAX_N];
+vector<int> adj[MAX_N];
 
 int aug(int u) {
     if (visited[u])
         return 0;
     visited[u] = true;
-    for (int v : adj[u])
+    for (int v : adj[u]) {
         if (match[v] == -1 || aug(match[v])) {
             match[v] = u;
             return 1;
         }
+    }
     return 0;
 }
 
 int mcbm() {
     int ret = 0;
     memset(match, -1, sizeof(match));
-    for (int i=0; i<n; i++) {
+    for (int i = 0; i < n; i++) {
         memset(visited, false, sizeof(visited));
         ret += aug(i);
     }

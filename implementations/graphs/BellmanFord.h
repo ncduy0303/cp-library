@@ -16,14 +16,17 @@ bool bellmanFord(int s) {
     memset(dist, 0x3f, sizeof dist);
     dist[s] = 0; pre[s] = -1;
     for (int i = 0; i < n - 1; i++) {
+        bool progress = false;
         for (int u = 0; u < n; u++) {
             for (auto [v, w] : adj[u]) {
                 if (dist[v] > dist[u] + w) {
                     dist[v] = dist[u] + w;
                     pre[v] = u;
+                    progress = true;
                 }
             }
         }
+        if (!progress) break;
     }
     for (int u = 0; u < n; u++) {
         for (auto [v, w] : adj[u]) {

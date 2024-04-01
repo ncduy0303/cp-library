@@ -5,7 +5,7 @@
  * Time: O(n log n) build
  */
 
-template<char MIN_CHAR = '$', int ALPHA = 256> struct SuffixArray {
+template<char MIN_CHAR = '\1', int ALPHA = 256> struct SuffixArray {
     int n;
     string s;
     vector<int> pos, rnk, lcp;
@@ -13,7 +13,6 @@ template<char MIN_CHAR = '$', int ALPHA = 256> struct SuffixArray {
     SuffixArray(const string &_s) : n((int) _s.size() + 1), s(_s), pos(n), rnk(n), lcp(n - 1) {
         s += MIN_CHAR;
         buildSA();
-        buildLCP();
     }
  
     void buildSA() {
@@ -34,7 +33,9 @@ template<char MIN_CHAR = '$', int ALPHA = 256> struct SuffixArray {
                 pair<int,int> pre = {rnk[npos[i - 1]], rnk[(npos[i - 1] + (1 << k)) % n]};
                 nrnk[npos[i]] = nrnk[npos[i - 1]] + (cur != pre);
             }
-            pos = npos; rnk = nrnk;
+            swap(pos, npos);
+            swap(rnk, nrnk);
+            if (rnk[pos[n - 1]] == n - 1) break;
         }
     }
  

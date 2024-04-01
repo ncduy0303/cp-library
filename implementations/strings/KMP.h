@@ -29,3 +29,20 @@ int cntMatch(const string &s, const string &t) {
     }
     return cnt;
 }
+
+int cntMatch(const string &s, const string &t) {
+    int n = sz(t), m = sz(s);
+    auto f = preprocess(t);
+    int cnt = 0;
+    for (int i = 0, j = 0; i < m; i++) {
+        while (j > 0 && s[i] != t[j]) {
+            j = f[j - 1];
+        }
+        j += (s[i] == t[j]);
+        if (j == n) {
+            cnt++;
+            j = f[j - 1];
+        }
+    }
+    return cnt;
+}

@@ -7,9 +7,10 @@
 
 long long hungarian(const vector<vector<long long>> &adj) {
     int n = (int) adj.size(), m = (int) adj[0].size();
+    assert(n <= m);
     vector<long long> u(n), v(m);
     vector<int> match(m);
-    for (int i=1; i<n; i++) {
+    for (int i = 1; i < n; i++) {
         int w = 0;
         match[w] = i;
         vector<long long> dist(m, LLONG_MAX);
@@ -19,7 +20,7 @@ long long hungarian(const vector<vector<long long>> &adj) {
             vis[w] = true;
             int cur = match[w], nw = 0;
             long long delta = LLONG_MAX;
-            for (int j=1; j<m; j++)
+            for (int j = 1; j < m; j++)
                 if (!vis[j]) {
                     long long edge = adj[cur][j] - u[cur] - v[j];
                     if (edge < dist[j]) {
@@ -31,7 +32,7 @@ long long hungarian(const vector<vector<long long>> &adj) {
                         nw = j;
                     }
                 }
-            for (int j=0; j<m; j++) {
+            for (int j = 0; j < m; j++) {
                 if (vis[j]) {
                     u[match[j]] += delta;
                     v[j] -= delta;

@@ -1,7 +1,8 @@
 /**
  * Description: Primality test
  * Source: https://github.com/kth-competitive-programming/kactl/blob/master/content/number-theory/MillerRabin.h
- * Verification: https://www.spoj.com/problems/PRIC/
+ * Source: https://cp-algorithms.com/algebra/primality_tests.html#miller-rabin-primality-test
+ * Verification: https://www.spoj.com/problems/PRIC/, https://open.kattis.com/problems/mostdifficult
  * Time: O(log n)
  */
 
@@ -29,6 +30,53 @@ bool isPrime(ull n) {
         while (p != 1 && p != n - 1 && a % n && i--)
             p = mul(p, p, n);
         if (p != n - 1 && i != s)
+            return false;
+    }
+    return true;
+}
+
+
+using u64 = uint64_t;
+using u128 = __uint128_t;
+
+u64 binpower(u64 base, u64 e, u64 mod) {
+    u64 result = 1;
+    base %= mod;
+    while (e) {
+        if (e & 1)
+            result = (u128)result * base % mod;
+        base = (u128)base * base % mod;
+        e >>= 1;
+    }
+    return result;
+}
+
+bool check_composite(u64 n, u64 a, u64 d, int s) {
+    u64 x = binpower(a, d, n);
+    if (x == 1 || x == n - 1)
+        return false;
+    for (int r = 1; r < s; r++) {
+        x = (u128)x * x % n;
+        if (x == n - 1)
+            return false;
+    }
+    return true;
+};
+
+bool MillerRabin(u64 n, int iter=5) { // returns true if n is probably prime, else returns false.
+    if (n < 4)
+        return n == 2 || n == 3;
+
+    int s = 0;
+    u64 d = n - 1;
+    while ((d & 1) == 0) {
+        d >>= 1;
+        s++;
+    }
+
+    for (int i = 0; i < iter; i++) {
+        int a = 2 + rand() % (n - 3);
+        if (check_composite(n, a, d, s))
             return false;
     }
     return true;

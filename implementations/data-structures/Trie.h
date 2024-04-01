@@ -5,18 +5,19 @@
  * Time: O(length) insertion and query
  */
 
-#define MAX 100000
-#define ALPHA 26
+#define MAX_N 100000
+#define MAX_C 26
 
-int id = 1, trie[MAX][ALPHA], cnt[MAX];
+int id = 1, trie[MAX_N][MAX_C], cnt[MAX_N];
 
 void add(const string &s) {
     int u = 0;
     cnt[u]++;
     for (char c : s) {
-        if (!trie[u][c-'a'])
-            trie[u][c-'a'] = id++;
-        u = trie[u][c-'a'];
+        c -= 'a';
+        if (!trie[u][c])
+            trie[u][c] = id++;
+        u = trie[u][c];
         cnt[u]++;
     }
 }
@@ -24,9 +25,10 @@ void add(const string &s) {
 int query(const string &s) {
     int u = 0;
     for (char c : s) {
-        if (!trie[u][c-'a'])
+        c -= 'a';
+        if (!trie[u][c])
             return 0;
-        u = trie[u][c-'a'];
+        u = trie[u][c];
     }
     return cnt[u];
 }

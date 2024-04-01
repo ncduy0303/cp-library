@@ -57,7 +57,7 @@ template<char MIN_CHAR = 'a', int ALPHA = 26> struct SuffixAutomaton {
     int firstMatching(const string &t) {
         int cur = 0;
         for (char c : t) {
-            int cc = c - 'a';
+            int cc = getIndex(c);
             if (!nxt[cur][cc]) return -1;
             cur = nxt[cur][cc];
         }

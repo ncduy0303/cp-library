@@ -79,6 +79,7 @@ template<char MIN_CHAR = '\1', int ALPHA = 256> struct SuffixArray {
     }
 
     string kthSubstr(ll k) {
+        // k-th distinct substring
         for (int i = 1; i < n; i++) {
             int nxt = n - 1 - pos[i] - lcp[i - 1];
             if (k > nxt) {

@@ -18,7 +18,7 @@ long long gcd(long long a, long long b, long long &x, long long &y) {
     return d;
 }
 
-bool solve(long long a, long long b, long long c, long long &x0, long long &y0, long long &g) {
+bool lce(long long a, long long b, long long c, long long &x0, long long &y0, long long &g) {
     g = gcd(a, b, x0, y0);
     if (c % g)
         return false;
@@ -40,7 +40,7 @@ pair<long long, long long> crt() {
     long long ret = a[0], lcm = m[0];
     for (int i=1; i<k; i++) {
         long long x, y, d;
-        if (!solve(lcm, m[i], a[i] - ret, x, y, d))
+        if (!lce(lcm, m[i], a[i] - ret, x, y, d))
             return {-1, -1};    // no solution
 
         ret = normalize(ret + x % (m[i] / d) * lcm, lcm / d * m[i]);

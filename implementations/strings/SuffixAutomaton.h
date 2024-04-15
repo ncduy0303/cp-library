@@ -62,6 +62,7 @@ template<char MIN_CHAR = 'a', int ALPHA = 26> struct SuffixAutomaton {
         link.emplace_back();
         firstPos.emplace_back(len[last] + 1);
         nxt.emplace_back();
+        ending.emplace_back(1);
         while (p != -1 && !nxt[p][i]) {
             nxt[p][i] = cur;
             p = link[p];
@@ -76,6 +77,7 @@ template<char MIN_CHAR = 'a', int ALPHA = 26> struct SuffixAutomaton {
                 link.push_back(link[q]);
                 firstPos.push_back(firstPos[q]);
                 nxt.push_back(nxt[q]);
+                ending.emplace_back(0);
                 while (p != -1 && nxt[p][i] == q) {
                     nxt[p][i] = clone;
                     p = link[p];
